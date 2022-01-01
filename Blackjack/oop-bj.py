@@ -25,7 +25,7 @@ class Deck(list):
     def __init__(self):
         self.cards = []
         self.suits = ["Spades", "Diamonds", "Hearts", "Clubs"]
-        self.faceNames = ["Ace", "Jack", "Queen", "King"]
+        self.face_names = ["Ace", "Jack", "Queen", "King"]
         self.build()
 
     def build(self):
@@ -33,17 +33,17 @@ class Deck(list):
         for suit in range(0, len(self.suits)):
             for value in range(1, 14):
                 if value == 1:
-                    label = (self.faceNames[0] + " of " + self.suits[suit])
+                    label = (self.face_names[0] + " of " + self.suits[suit])
                 elif value > 1 and value < 11:
                     label = (str(value) + " " + self.suits[suit])
                 elif value == 11:
-                    label = (self.faceNames[1] + " of " + self.suits[suit])
+                    label = (self.face_names[1] + " of " + self.suits[suit])
                     value = 10
                 elif value == 12:
-                    label = (self.faceNames[2] + " of " + self.suits[suit])
+                    label = (self.face_names[2] + " of " + self.suits[suit])
                     value = 10
                 elif value == 13:
-                    label = (self.faceNames[3] + " of " + self.suits[suit])
+                    label = (self.face_names[3] + " of " + self.suits[suit])
                     value = 10
                 self.cards.append(Card(value, suit, label))
 
@@ -64,20 +64,20 @@ class Deck(list):
         """Draw x number of cards from the deck"""
         self.hand = []
         for i in range(numCards):
-            cardDrawn = self.cards.pop()
-            cardDrawn.shown = True
-            self.hand.append(cardDrawn)
+            card_drawn = self.cards.pop()
+            card_drawn.shown = True
+            self.hand.append(card_drawn)
         return self.hand
 
     def cleanUp(self, p1, cpu):
         for i in range(0,len(p1.hand)):
-            cardReturned = p1.hand.pop()
-            cardReturned.shown = False
-            self.cards.append(cardReturned)
+            card_returned = p1.hand.pop()
+            card_returned.shown = False
+            self.cards.append(card_returned)
         for i in range(0,len(cpu.hand)):
-            cardReturned = cpu.hand.pop()
-            cardReturned.shown = False
-            self.cards.append(cardReturned)
+            card_returned = cpu.hand.pop()
+            card_returned.shown = False
+            self.cards.append()
         
         #try:
             #if len(self.cards) == 52:
@@ -96,10 +96,10 @@ class Player(object):
     def __init__(self):
         self.name = ""
         self.hand = []
-        self.handVal = 0
+        self.hand_value = 0
 
-    def drawHand(self, deck, numCards):
-        self.hand = (deck.draw(numCards))
+    def drawHand(self, deck, card_quantity):
+        self.hand = (deck.draw(card_quantity))
         return self.hand
     
     def drawX(self, deck, numCards):
@@ -110,11 +110,11 @@ class Player(object):
 
     def handValue(self):
         """Update the value of the players hand"""
-        handTotal = 0
+        x = 0
         for i in range(len(self.hand)):
-            handTotal += self.hand[i].value
-        print ("Hand value is: {}".format(handTotal))
-        self.handVal = handTotal
+            x += self.hand[i].value
+        self.hand_value = x
+        print ("Hand value is: {}".format(self.hand_value))
 
     def show(self):
         """Show the hand and it's current value"""
@@ -134,7 +134,7 @@ class game(object):
         self.deck.shuffle()
         self.cpu = Player()
         self.cpu.playerName = "The Dealer"
-        self.drawOpt = ["hit", "stand", "double down", "split", "surrender"]
+        self.draw_option = ["hit", "stand", "double down", "split", "surrender"]
     
     def run(self):
         self.p1 = Player()
@@ -161,6 +161,7 @@ class game(object):
         print ("\nThe dealer has:")
         self.cpu.drawHand(self.deck,2)
         self.cpu.show()
+
     
     def drawOrStay(self):
         """User decisions"""
@@ -180,18 +181,18 @@ class game(object):
                 if draw == 1:
                     self.p1.drawX(self.deck,1)
                     self.p1.show()
-                    return self.drawOpt[0]
+                    return self.draw_option[0]
                 elif draw == 2:
                     print ("So you're feeling lucky huh?")
-                    return self.drawOpt[1]
+                    return self.draw_option[1]
                 elif draw == 3:
                     print ("Doubling your bet huh? You won't be dealt anymore cards this game:")
                     self.p1.drawX(self.deck,1)
                     self.p1.show()
-                    return self.drawOpt[2]
+                    return self.draw_option[2]
                 elif draw == 4:
-                    print ("Ooops, I still need to write the logic for this")
-                    return self.drawOpt[3]
+                    print ("...Ooops, I still need to write the logic for this")
+                    return self.draw_option[3]
                 elif draw == 5:
                     print ("Quitting early, maybe next hand.")
                     self.quit = True
@@ -201,13 +202,14 @@ class game(object):
         except:
             print ("WARNING: That wasn't an option, get out!!!")
             self.quit = True
+
     
     def validate(self):
         """Check that the hand is higher than 2 and lower than 21"""
-        while self.p1.handVal >= 2 and self.p1.handVal <= 20:
+        while self.p1.hand_value >= 2 and self.p1.hand_value <= 20:
             self.drawOrStay()
         else:
-            if self.p1.handVal == 21:
+            if self.p1.hand_value == 21:
                 print("You've won, take your money and get out of here!!!")
             else:
                 print ("Game Over - Give me your money sucka!!!\n")
