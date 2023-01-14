@@ -110,7 +110,7 @@ def main():
         camera_z = x[3][2]
         
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)        
-        glTranslatef(0, 0, -1)
+        glTranslatef(0, 0, -0.1)
         
         glCube()
         pygame.display.flip()
