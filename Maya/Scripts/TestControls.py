@@ -33,8 +33,7 @@ def testCubes(names,scaleVals):
     count = 0
     for name in names:
         sizeVals = scaleVals[count]
-        selObj = pm.polyCube(n=name)
-        pm.scale(selObj, sizeVals[0] , sizeVals[1] , sizeVals[2], r=True)
+        selObj = pm.polyCube(n=name, h=sizeVals[0], w=sizeVals[1], d=sizeVals[2])
         cubeList.append(pm.ls(sl=True))
         count += 1
     for i in range(1,len(cubeList)):
