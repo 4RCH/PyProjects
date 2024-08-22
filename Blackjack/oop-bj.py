@@ -51,8 +51,8 @@ class Deck(list):
         """Flags wether a card as facing down - may remove this"""
         for card in self.cards:
             card.show(False)
-        #print("\nHere's the deck, it is a standard deck and has {0} cards.\n".format(len(self.cards)))
-        #print (self.cards)
+        print("\nHere's the deck, it is a standard deck and has {0} cards.\n".format(len(self.cards)))
+        print (self.cards)
 
     def shuffle(self):
         """Shuffles a deck of cards"""
