@@ -14,10 +14,8 @@ class Card(object):
         else:
             print("?", end="")
 
-
     def __repr__(self):
         return self.label
-
 
 class Deck(list):
     """Creates and handles a standard deck of cards"""
@@ -35,7 +33,7 @@ class Deck(list):
                 if value == 1:
                     label = (self.face_names[0] + " of " + self.suits[suit])
                 elif value > 1 and value < 11:
-                    label = (str(value) + " " + self.suits[suit])
+                    label = (str(value) + " of " + self.suits[suit])
                 elif value == 11:
                     label = (self.face_names[1] + " of " + self.suits[suit])
                     value = 10
@@ -69,27 +67,16 @@ class Deck(list):
             self.hand.append(card_drawn)
         return self.hand
 
-    def cleanUp(self, p1, cpu):
-        for i in range(0,len(p1.hand)):
-            card_returned = p1.hand.pop()
-            card_returned.shown = False
-            self.cards.append(card_returned)
-        for i in range(0,len(cpu.hand)):
-            card_returned = cpu.hand.pop()
-            card_returned.shown = False
-            self.cards.append()
-        
-        #try:
-            #if len(self.cards) == 52:
-                #print("things are all good, another game?")
-        #except:
-            #print("something went wrong")
+    def clean_up(self, p1, cpu):
+        for player in [p1, cpu]:
+            while player.hand:
+                card_Returned = player.hand.pop()
+                card_Returned.shown = False
+                self.cards.append(card_Returned)
         return
 
-
-    def __repr__():
+    def __repr__(self):
         return ("Card Stack")
-
 
 class Player(object):
 
@@ -98,74 +85,77 @@ class Player(object):
         self.hand = []
         self.hand_value = 0
 
-    def drawHand(self, deck, card_quantity):
+    def draw_hand(self, deck, card_quantity):
         self.hand = (deck.draw(card_quantity))
         return self.hand
     
-    def drawX(self, deck, numCards):
+    def draw_x(self, deck, numCards):
         """Draw a card and add it to the player hand"""
-        x = deck.draw(numCards)
-        self.hand.append(x.pop())
+        new_cards = deck.draw(numCards)
+        self.hand.extend(new_cards)
         return self.hand
 
-    def handValue(self):
+    def calculate_hand_value(self):
         """Update the value of the players hand"""
         x = 0
-        for i in range(len(self.hand)):
-            x += self.hand[i].value
+        ace_count = 0
+        for card in self.hand:
+            x += card.value
+            if card.label.startswith("Ace"):
+                ace_count += 1
+        while x > 21 and ace_count:
+            x -= 10
+            ace_count -= 1
         self.hand_value = x
         print ("Hand value is: {}".format(self.hand_value))
 
     def show(self):
         """Show the hand and it's current value"""
         print(self.hand)
-        self.handValue()
+        self.calculate_hand_value()
         
-    def playerName(self):
+    def player_name(self):
         self.name = input("What would you like to be known as?\n>>>")
         return self.name
 
-
-class game(object):
+class Game(object):
     """This is Blackjack"""
     def __init__(self):
         self.quit = False
         self.deck = Deck()
         self.deck.shuffle()
         self.cpu = Player()
-        self.cpu.playerName = "The Dealer"
+        self.cpu.name = "The Dealer"
         self.draw_option = ["hit", "stand", "double down", "split", "surrender"]
     
     def run(self):
         self.p1 = Player()
-        self.p1.playerName()
+        self.p1.player_name()
         while not self.quit:
             self.deck.shuffle()
             print ("\nHold on I'm shuffling...")
             time.sleep(0.5)
-            self.dealCards()
+            self.deal_cards()
             self.validate()
-            self.deck.cleanUp(self.p1,self.cpu)
+            self.deck.clean_up(self.p1,self.cpu)
     
-    def dealCards(self):
+    def deal_cards(self):
         """Deal the initial hands to the player and the dealer"""
         print("OK {0} we're ready to go!\n".format(self.p1.name))        
         print("Here are your cards:")
-        self.p1.drawHand(self.deck,2)
+        self.p1.draw_hand(self.deck,2)
         self.p1.show()
-        self.cpuDraw()
-        
-    
-    def cpuDraw(self):
+        self.cpu_draw()
+
+    def cpu_draw(self):
         """CPU draws cards - Currently only the initial hand"""
         print ("\nThe dealer has:")
-        self.cpu.drawHand(self.deck,2)
+        self.cpu.draw_hand(self.deck,2)
         self.cpu.show()
 
-    
-    def drawOrStay(self):
+    def draw_or_stay(self):
         """User decisions"""
-        self.playDes = 0
+    
         time.sleep(0.5)
         print("\nWhat would you like to do next?\n",
               "[1 - Hit]\t",
@@ -174,53 +164,74 @@ class game(object):
               "[4 - Split]\t",
               "[5 - Surrender]")
 
-        draw = int(input("Type the option >>>"))
         try:
-            userOpt = isinstance(draw, int)
-            if userOpt and draw >= 1 and draw <= 5:
-                if draw == 1:
-                    self.p1.drawX(self.deck,1)
+            draw = int(input("Type the option >>>"))
+            if draw == 1:
+                self.p1.draw_x(self.deck,1)
+                self.p1.show()
+                return self.draw_option[0]
+            elif draw == 2:
+                print ("So you're feeling lucky huh?")
+                return self.draw_option[1]
+            elif draw == 3:
+                print ("Doubling your bet huh? You won't be dealt anymore cards this game:")
+                self.p1.draw_x(self.deck,1)
+                self.p1.show()
+                return self.draw_option[2]
+            elif draw == 4:
+                if len(self.p1.hand) == 2 and self.p1.hand[0].value == self.p1.hand[1].value:
+                    print ("Splitting your hand...")
+                    self.p1.draw_x(self.deck, 1)
+                    self.p1.draw_x(self.deck, 1)
                     self.p1.show()
-                    return self.draw_option[0]
-                elif draw == 2:
-                    print ("So you're feeling lucky huh?")
-                    return self.draw_option[1]
-                elif draw == 3:
-                    print ("Doubling your bet huh? You won't be dealt anymore cards this game:")
-                    self.p1.drawX(self.deck,1)
-                    self.p1.show()
-                    return self.draw_option[2]
-                elif draw == 4:
-                    print ("...Ooops, I still need to write the logic for this")
                     return self.draw_option[3]
-                elif draw == 5:
-                    print ("Quitting early, maybe next hand.")
-                    self.quit = True
-            elif userOpt:
+                else:
+                    print("You can't split this hand.")
+                    return self.draw_option[3]
+            elif draw == 5:
+                print ("Quitting early, maybe next hand.")
+                self.quit = True
+            else:
                 print ("WARNING: I didn't give you that option *eyeroll*")
                 self.quit = True
-        except:
+        except ValueError:
             print ("WARNING: That wasn't an option, get out!!!")
             self.quit = True
 
-    
+    def dealerTurn(self):
+        while self.cpu.hand_value < 17:
+            self.cpu.draw_x(self.deck, 1)
+            self.cpu.calculate_hand_value()
+        print("\nDealer's final hand")
+        self.cpu.show()
+
     def validate(self):
         """Check that the hand is higher than 2 and lower than 21"""
         while self.p1.hand_value >= 2 and self.p1.hand_value <= 20:
-            self.drawOrStay()
+            action = self.draw_or_stay()
+            if action == "stand":
+                break
         else:
             if self.p1.hand_value == 21:
                 print("You've won, take your money and get out of here!!!")
-            else:
-                print ("Game Over - Give me your money sucka!!!\n")
-            
+                return
+            elif self.p1.hand_value > 21:
+                print ("Game Over - You busted!!!")
+                return
 
+        self.dealerTurn()
+
+        if self.cpu.hand_value > 21 or self.p1.hand_value >self.cpu.hand_value:
+            print("you've won, take your money and get out of here!!!")
+        elif self.p1.hand_value < self.cpu.hand_value:
+            print("Game Over - Dealer wins!!!")
+        else:
+            print("it's a tie!")
 
 def main():
-    newgame = game()
+    newgame = Game()
     newgame.run()
     pass
-
 
 if __name__ == "__main__":
     main()
