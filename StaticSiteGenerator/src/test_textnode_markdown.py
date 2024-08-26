@@ -24,5 +24,10 @@ class TestMarkdown(unittest.TestCase):
         splitnode = split_nodes_delimiter([node3], tt.delimiter_code, tt.text_type_code)
         self.assertEqual(str(splitnode), "[Textnode New is text with , text, None, Textnode code, code, None, Textnode  tags., text, None]")
 
+    def test_missing_markdown(self):
+        node3 = TextNode("This * isn't a tag.", tt.text_type_italic)
+        with self.assertRaises(ValueError):
+            split_nodes_delimiter([node3], tt.delimiter_italics, tt.text_type_italic)
+
 if __name__ == "__main__":
     unittest.main()
