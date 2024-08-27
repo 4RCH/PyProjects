@@ -1,7 +1,7 @@
 import unittest
 import texttypes as tt
 from textnode import TextNode
-from textnode_markdown import split_nodes_delimiter
+from textnode_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_links
 
 class TestMarkdown(unittest.TestCase):
     def test_bold(self):
@@ -28,6 +28,34 @@ class TestMarkdown(unittest.TestCase):
         node3 = TextNode("This * isn't a tag.", tt.text_type_italic)
         with self.assertRaises(ValueError):
             split_nodes_delimiter([node3], tt.delimiter_italics, tt.text_type_italic)
+    
+    def test_extract_images(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        self.assertListEqual(extract_markdown_images(text), [('rick roll', 'https://i.imgur.com/aKaOqIh.gif'), ('obi wan', 'https://i.imgur.com/fJRm4Vk.jpeg')])
+
+    def test_extract_links(self):
+        text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+        self.assertListEqual(extract_markdown_links(text), [('to boot dev', 'https://www.boot.dev'), ('to youtube', 'https://www.youtube.com/@bootdotdev')])
+
+    def test_split_nodes_image(self):
+        nodes = TextNode("This is text with some images ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)", tt.text_type_text)
+        result = [
+            TextNode("This is text with some images ", tt.text_type_text),
+            TextNode("rick roll", tt.text_type_image, "https://i.imgur.com/aKaOqIh.gif"),
+            TextNode(" and ", tt.text_type_text),
+            TextNode("obi wan", tt.text_type_image, "https://i.imgur.com/fJRm4Vk.jpeg"),
+        ]
+        self.assertListEqual(split_nodes_image(nodes) , result)
+
+    def test_split_nodes_links(self):
+        nodes = TextNode("This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)", tt.text_type_text)
+        result = [
+            TextNode("This is text with a link ", tt.text_type_text),
+            TextNode("to boot dev", tt.text_type_link, "https://www.boot.dev"),
+            TextNode(" and ", tt.text_type_text),
+            TextNode("to youtube", tt.text_type_link, "https://www.youtube.com/@bootdotdev"),
+        ]
+        self.assertListEqual(split_nodes_links(nodes) , result)
 
 if __name__ == "__main__":
     unittest.main()
