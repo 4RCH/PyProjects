@@ -13,13 +13,9 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         if len(chunks)% 2 == 0:
             raise ValueError("[!] Missing closing delimiter")
         for i, chunk in enumerate(chunks):
-            if chunk == "":
-                continue
-            if i % 2:
-                split_nodes.append(TextNode(chunk, text_type))
-            else:
-                split_nodes.append(TextNode(chunk, tt.text_type_text))
-        new_nodes.extend(split_nodes)
+            if chunk:
+                new_nodes.append(TextNode(chunk, text_type if i % 2 else tt.text_type_text))
+            
     return new_nodes
 
 def extract_markdown_images(raw_markdown):

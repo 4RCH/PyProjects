@@ -57,5 +57,36 @@ class TestMarkdown(unittest.TestCase):
         ]
         self.assertListEqual(split_nodes_links(nodes) , result)
 
+    def test_split_multiple_nodes(self):
+        nodes = [
+            TextNode("This text directs you to Google [to Google](https://www.google.com) all roads go to Google", tt.text_type_text),
+            TextNode("This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)", tt.text_type_text),
+        ]
+        result = [
+            TextNode("This text directs you to Google ", tt.text_type_text),
+            TextNode("to Google", tt.text_type_link, "https://www.google.com"),
+            TextNode(" all roads go to Google", tt.text_type_text),
+            TextNode("This is text with a link ", tt.text_type_text),
+            TextNode("to boot dev", tt.text_type_link, "https://www.boot.dev"),
+            TextNode(" and ",tt.text_type_text),
+            TextNode("to youtube", tt.text_type_link, "https://www.youtube.com/@bootdotdev"),
+
+        ]
+        self.assertListEqual(split_nodes_links(nodes), result)
+    
+    def test_split_multiple_images(self):
+        nodes = [
+            TextNode("This is an image ![Deadpool](https://imgur.com/gallery/deadpool-icon-Psrh9jM) Oh noes![-_-]", tt.text_type_text),
+            TextNode("This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)", tt.text_type_text)
+        ]
+        results = [
+            TextNode("This is an image ", tt.text_type_text),
+            TextNode("Deadpool", tt.text_type_image, "https://imgur.com/gallery/deadpool-icon-Psrh9jM"),
+            TextNode("This is text with a ", tt.text_type_text),
+            TextNode("rick roll", tt.text_type_link, "https://i.imgur.com/aKaOqIh.gif"),
+            TextNode(" and ", tt.text_type_text),
+            TextNode("obi wan", tt.text_type_image, "https://i.imgur.com/fJRm4Vk.jpeg"),
+        ]
+
 if __name__ == "__main__":
     unittest.main()
