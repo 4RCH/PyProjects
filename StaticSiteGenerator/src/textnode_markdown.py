@@ -32,41 +32,35 @@ def extract_markdown_links(raw_markdown):
     formatted_text = re.findall(pattern, raw_markdown)
     return formatted_text
 
-def split_nodes_image(node):
-    split_nodes =[]
-    image_data = extract_markdown_images(node.text)
-    last_index = 0
-    
-    for image in image_data:
-        start_index = node.text.find(f'![{image[0]}]({image[1]})', last_index)
-        if start_index != -1:
+def split_nodes_generic(nodes, pattern, text_type):
+    new_nodes = []
+    for node in nodes:
+        split_nodes =[]
+        matches = re.finditer(pattern, node.text)
+        last_index = 0
+        
+        for match in matches:
+            start_index = match.start()
             if start_index > last_index:
                 split_nodes.append(TextNode(node.text[last_index:start_index], tt.text_type_text))
-            split_nodes.append(TextNode(image[0], tt.text_type_image, image[1]))
-            last_index = start_index + len(f'![{image[0]}]({image[1]})')
+            if text_type == tt.text_type_image:
+                split_nodes.append(TextNode(match.group(1), text_type, match.group(2)))
+            else:
+                split_nodes.append(TextNode(match.group(1), text_type, match.group(2)))
+            last_index = match.end()
+        
+        #add remaining text after the last image
+        if last_index < len(node.text):
+            split_nodes.append(TextNode(node.text[last_index:], tt.text_type_text))
 
-    #add remaining text after the last image
-    if last_index < len(node.text):
-        split_nodes.append(TextNode(node.text[last_index:], tt.text_type_text))
-    
-    return split_nodes
+        new_nodes.extend(split_nodes)
+    return new_nodes
 
-def split_nodes_links(node):
-    split_nodes =[]
-    link_data = extract_markdown_links(node.text)
-    last_index = 0
+def split_nodes_image(nodes):
+    pattern = r"!\[(.*?)\]\((.*?)\)"
+    return split_nodes_generic(nodes, pattern, tt.text_type_image)
 
-    for link in link_data:
-        start_index = node.text.find(f'[{link[0]}]({link[1]})', last_index)
-        if start_index != -1:
-            if start_index > last_index:
-                split_nodes.append(TextNode(node.text[last_index:start_index], tt.text_type_text))
-            split_nodes.append(TextNode((link[0]), tt.text_type_link, link[1]))
-            last_index = start_index + len(f'[{link[0]}]({link[1]})')
-    
-    #add remaining text after the last link
-    if last_index < len(node.text):
-        split_nodes.append(TextNode(node.text[last_index:], tt.text_type_text))
-    
-    return split_nodes
+def split_nodes_links(nodes):
+    pattern = r"\[(.*?)\]\((.*?)\)"
+    return split_nodes_generic(nodes, pattern, tt.text_type_link)
 

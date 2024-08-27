@@ -38,7 +38,7 @@ class TestMarkdown(unittest.TestCase):
         self.assertListEqual(extract_markdown_links(text), [('to boot dev', 'https://www.boot.dev'), ('to youtube', 'https://www.youtube.com/@bootdotdev')])
 
     def test_split_nodes_image(self):
-        nodes = TextNode("This is text with some images ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)", tt.text_type_text)
+        nodes = [TextNode("This is text with some images ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)", tt.text_type_text),]
         result = [
             TextNode("This is text with some images ", tt.text_type_text),
             TextNode("rick roll", tt.text_type_image, "https://i.imgur.com/aKaOqIh.gif"),
@@ -48,7 +48,7 @@ class TestMarkdown(unittest.TestCase):
         self.assertListEqual(split_nodes_image(nodes) , result)
 
     def test_split_nodes_links(self):
-        nodes = TextNode("This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)", tt.text_type_text)
+        nodes = [TextNode("This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)", tt.text_type_text),]
         result = [
             TextNode("This is text with a link ", tt.text_type_text),
             TextNode("to boot dev", tt.text_type_link, "https://www.boot.dev"),
