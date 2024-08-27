@@ -5,10 +5,9 @@ import texttypes as tt
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     new_nodes = []
     for old_node in old_nodes:
-        if old_node.text_type != text_type:
+        if old_node.text_type != tt.text_type_text:
             new_nodes.append(old_node)
             continue
-        split_nodes = []
         chunks = old_node.text.split(delimiter)
         if len(chunks)% 2 == 0:
             raise ValueError("[!] Missing closing delimiter")
@@ -31,6 +30,10 @@ def extract_markdown_links(raw_markdown):
 def split_nodes_generic(nodes, pattern, text_type):
     new_nodes = []
     for node in nodes:
+        if not re.search(pattern, node.text):
+            new_nodes.append(node)
+            continue
+        
         split_nodes =[]
         matches = re.finditer(pattern, node.text)
         last_index = 0
@@ -39,10 +42,7 @@ def split_nodes_generic(nodes, pattern, text_type):
             start_index = match.start()
             if start_index > last_index:
                 split_nodes.append(TextNode(node.text[last_index:start_index], tt.text_type_text))
-            if text_type == tt.text_type_image:
-                split_nodes.append(TextNode(match.group(1), text_type, match.group(2)))
-            else:
-                split_nodes.append(TextNode(match.group(1), text_type, match.group(2)))
+            split_nodes.append(TextNode(match.group(1), text_type, match.group(2)))
             last_index = match.end()
         
         #add remaining text after the last image
@@ -53,10 +53,22 @@ def split_nodes_generic(nodes, pattern, text_type):
     return new_nodes
 
 def split_nodes_image(nodes):
-    pattern = r"!\[(.*?)\]\((.*?)\)"
-    return split_nodes_generic(nodes, pattern, tt.text_type_image)
+    return split_nodes_generic(nodes, r"!\[(.*?)\]\((.*?)\)", tt.text_type_image)
 
 def split_nodes_links(nodes):
-    pattern = r"\[(.*?)\]\((.*?)\)"
-    return split_nodes_generic(nodes, pattern, tt.text_type_link)
+    return split_nodes_generic(nodes, r"\[(.*?)\]\((.*?)\)", tt.text_type_link)
 
+def text_to_textnode(raw_text):
+    new_nodes = [TextNode(raw_text, tt.text_type_text)]
+    delimiters =[
+        (tt.delimiter_bold, tt.text_type_bold),
+        (tt.delimiter_italics, tt.text_type_italic),
+        (tt.delimiter_code, tt.text_type_code),
+    ]
+
+    for delimiter, text_type in delimiters:
+        new_nodes = split_nodes_delimiter(new_nodes, delimiter, text_type)
+    new_nodes = split_nodes_image(new_nodes)
+    new_nodes = split_nodes_links(new_nodes)
+
+    return new_nodes
