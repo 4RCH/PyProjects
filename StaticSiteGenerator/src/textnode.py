@@ -1,5 +1,5 @@
 from htmlnode import LeafNode
-import texttypes as tt
+import data_constants as tt
 
 class TextNode():
     def __init__(self, text, text_type, url=None):

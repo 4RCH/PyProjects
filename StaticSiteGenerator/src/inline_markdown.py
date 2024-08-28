@@ -1,6 +1,6 @@
 import re
 from textnode import TextNode
-import texttypes as tt
+import data_constants as tt
 
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     new_nodes = []

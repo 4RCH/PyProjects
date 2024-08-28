@@ -1,5 +1,5 @@
 import unittest
-import texttypes as tt
+import data_constants as tt
 from textnode import TextNode
 from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_links, text_to_textnode
 
