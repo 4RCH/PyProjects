@@ -29,7 +29,7 @@ blocks = [
 class TestBlockMarkdown(unittest.TestCase):
 
     def setUp(self):
-        with open("./src/markdown.md", "r", encoding="UTF-8") as block_list:
+        with open("./static/markdown.md", "r", encoding="UTF-8") as block_list:
             self.markdown_content = block_list.read()
         
     """Test that markdown content is correctly split into blocks."""
@@ -69,5 +69,6 @@ class TestBlockMarkdown(unittest.TestCase):
 
     def test_single_line_markdown(self):
         self.assertEqual(markdown_to_blocks("# Single line heading"), ["# Single line heading"])
+
 if __name__ == "__main__":
     unittest.main()
