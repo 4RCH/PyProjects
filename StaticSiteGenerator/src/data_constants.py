@@ -12,6 +12,7 @@ delimiter_links = "["
 delimiter_image = "!["
 delimiter_quotes = ">"
 
+tag_paragraph = ""
 tag_heading = "#"
 tag_code = "`"
 tag_quote = ">"

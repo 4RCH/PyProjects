@@ -5,9 +5,16 @@ import data_constants as tt
 def split_nodes_delimiter(old_nodes, delimiter, text_type):
     new_nodes = []
     for old_node in old_nodes:
+        # Check if the old_node is a text node and if so let it go...
         if old_node.text_type != tt.text_type_text:
             new_nodes.append(old_node)
             continue
+        # Check if the old_node is a list node and if so let it go...
+        if old_node.text.strip().startswith(('* ', '- ', '+ ')):
+            new_nodes.append(old_node)
+            continue
+
+        # Now to deal with real delimiters...
         chunks = old_node.text.split(delimiter)
         if len(chunks)% 2 == 0:
             raise ValueError("[!] Missing closing delimiter")

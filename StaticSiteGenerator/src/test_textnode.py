@@ -1,5 +1,6 @@
 import unittest
 from textnode import TextNode
+import data_constants as tt
 
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
@@ -21,7 +22,7 @@ class TestTextNode(unittest.TestCase):
 
     def test_badStyle(self):
         node = TextNode("This is a text node", "c0de", "http://www.google.com")
-        valid_types = ["text", "bold", "italic", "code", "link", "image"]
+        valid_types = [tt.text_type_text, tt.text_type_bold, tt.text_type_italic, tt.text_type_code, tt.text_type_code, tt.text_type_image]
         self.assertNotIn(node.text_type, valid_types, "Invalid text_type")
     
 

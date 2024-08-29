@@ -12,8 +12,8 @@ class HTMLNode():
     def __init__(self, tag=None, value=None, children=None, props=None):
         self.tag = tag
         self.value = value
-        self.children = children
-        self.props = props
+        self.children = children if children is not None else []
+        self.props = props if props is not None else {}
 
     def to_html(self):
         assert NotImplementedError
@@ -26,13 +26,22 @@ class HTMLNode():
             props_html += f' {prop}="{self.props[prop]}"'
         return props_html
 
+    def __eq__(self, other):
+        if not isinstance(other, HTMLNode):
+            return False
+        return (self.tag == other.tag and
+                self.value == other.value and
+                self.children == other.children and
+                self.props == other.props)
+
     def __repr__(self):
         return f"\nHtmlNode: \ntag: {self.tag}\nvalue: {self.value}\nchildren: {self.children}\nprops: {self.props}\n"
 
 class LeafNode(HTMLNode):
     def __init__(self, tag, value, props=None):
         super().__init__(tag, value, None, props)
-
+    
+    #Encapsulates a given child node with its given tag
     def to_html(self):
         if self.value == None:
             raise ValueError("[!] Invalid HTML: missing value")
@@ -49,6 +58,7 @@ class ParentNode(HTMLNode):
     def __init__(self, tag, children, props=None):
         super().__init__(tag, None, children, props)
 
+    # Encapsulates the children nodes with the Parent node tag
     def to_html(self):
         if self.tag == None:
             raise ValueError("[!] Invalid HTML: missing tag")

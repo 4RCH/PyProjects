@@ -9,11 +9,12 @@ class Testhtmlnode(unittest.TestCase):
     
     def test_value(self):
         node = HTMLNode("a", None, None, {"href":"https://www.google.com"})
-        self.assertEqual(node.value, node.children)
+        self.assertEqual(node.value, None)
+        self.assertEqual(node.children, [])
     
     def test_prop(self):
         node = HTMLNode("a", "https://www.google.com", None, None)
-        self.assertIsNone(node.props, "[!] missing props")
+        self.assertEqual(node.props, {}, "[!] missing props")
 
     def test_props_to_html(self):
         node = HTMLNode("a", "https://www.google.com", None, {"href": "https://www.google.com", "target": "_blank",})
@@ -24,8 +25,8 @@ class Testhtmlnode(unittest.TestCase):
         self.assertEqual(node.to_html(), "This is plain text.")
     
     def test_no_children(self):
-        node = LeafNode("p", "No children here.")
-        self.assertEqual(node.to_html(), "<p>No children here.</p>")
+        node = LeafNode("p", "Single paragraph.")
+        self.assertEqual(node.to_html(), "<p>Single paragraph.</p>")
 
     def test_leaf_link(self):
         node = LeafNode("a", "This is a link to www.google.com.", {"href": "https://www.google.com"})
