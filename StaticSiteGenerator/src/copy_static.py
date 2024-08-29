@@ -103,7 +103,7 @@ def main():
     static_folder = "./static"
     backup_folder = './static/backups'
 
-    #make_backup(public_folder, backup_folder)
+    make_backup(public_folder, backup_folder)
     clean_up_static_folder(public_folder)
     contents = get_path_tree(public_folder)
     print_tree(contents)
