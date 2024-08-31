@@ -1,3 +1,2 @@
-Blackjack/*.png
-Blackjack/*.psd
-OpenGLCube/*.png
+Blackjack/images/**
+OpenGLCube/images/**
